@@ -1,18 +1,16 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { signIn } from 'next-auth/react';
-import { useRouter } from 'next/navigation'
+import { useRouter } from 'next/navigation';
 
 export function LoginForm() {
   const [email, setEmail] = useState('');
@@ -21,6 +19,12 @@ export function LoginForm() {
 
   const validateEmail = (email: string) => /\S+@\S+\.\S+/.test(email);
   const router = useRouter();
+
+  useEffect(() => {
+    // Clear stored credentials on component mount for security
+    localStorage.removeItem('email');
+    localStorage.removeItem('password');
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -39,7 +43,12 @@ export function LoginForm() {
       setError('Invalid email or password.');
       return;
     }
-      router.push('/profile')
+
+    // Save user credentials to localStorage
+    localStorage.setItem('email', email);
+    localStorage.setItem('password', password);
+
+    router.push('/profile');
   };
 
   return (
@@ -73,8 +82,6 @@ export function LoginForm() {
           <Button type="submit" className="w-full">Login</Button>
         </form>
       </CardContent>
-      <CardFooter>
-      </CardFooter>
     </Card>
   );
 }
