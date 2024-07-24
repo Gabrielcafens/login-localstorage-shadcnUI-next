@@ -1,89 +1,123 @@
 "use client";
 
 import React, { useEffect, useState } from 'react';
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
+import { useForm, Controller } from 'react-hook-form';
 import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { useRouter } from 'next/navigation';
 
-const ProfilePage = () => {
-  const [email, setEmail] = useState<string>('');
-  const [password, setPassword] = useState<string>('');
-  const [editMode, setEditMode] = useState<boolean>(false);
+type FormData = {
+  email: string;
+  password: string;
+  token: string;
+};
+
+export function ProfilePage() {
+  const { control, handleSubmit, reset } = useForm<FormData>();
+  const [isEditing, setIsEditing] = useState(false);
+  const [loading, setLoading] = useState(true);
   const router = useRouter();
 
   useEffect(() => {
-    const storedEmail = localStorage.getItem('email');
-    const storedPassword = localStorage.getItem('password');
+    const storedUser = localStorage.getItem('user');
 
-    if (storedEmail) setEmail(storedEmail);
-    if (storedPassword) setPassword(storedPassword);
-  }, []);
+    if (!storedUser) {
+      const timeoutId = setTimeout(() => {
+        router.push('/');
+      }, 600);
 
-  const handleSave = () => {
-    localStorage.setItem('email', email);
-    localStorage.setItem('password', password);
+      return () => clearTimeout(timeoutId);
+    } else {
+      const userData = JSON.parse(storedUser);
+      reset(userData);
+      setLoading(false);
+    }
+  }, [router, reset]);
 
-    setEditMode(false);
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
+  const onSubmit = (data: FormData) => {
+    localStorage.setItem('user', JSON.stringify(data));
+    alert('Perfil atualizado com sucesso!');
+    setIsEditing(false);
+  };
+
+  const handleEdit = () => {
+    if (isEditing) {
+      handleSubmit(onSubmit)();
+    } else {
+      setIsEditing(true);
+    }
   };
 
   const handleLogout = () => {
-    // Clear localStorage
-    localStorage.removeItem('email');
-    localStorage.removeItem('password');
-
-    router.push('/'); 
+    localStorage.removeItem('user');
+    router.push('/');
   };
 
   return (
-    <div className="p-8">
-      <Card className="max-w-md mx-auto">
+    <div className="flex items-center justify-center min-h-screen">
+      <Card className="w-full max-w-md p-8 space-y-8 rounded-lg shadow-lg">
         <CardHeader>
-          <CardTitle>Perfil</CardTitle>
+          <CardTitle>{isEditing ? 'Editar Perfil' : 'Perfil'}</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          {editMode ? (
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium">Email</label>
-                <Input
-                  type="email"
-                  value={email}
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEmail(e.target.value)}
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium">Password</label>
-                <Input
-                  type="password"
-                  value={password}
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPassword(e.target.value)}
-                />
-              </div>
-              <Button onClick={handleSave} className="w-full">Save</Button>
-              <Button onClick={() => setEditMode(false)} className="w-full">Cancel</Button>
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="email">Email</Label>
+              <Controller
+                name="email"
+                control={control}
+                render={({ field }) => (
+                  <Input
+                    id="email"
+                    type="email"
+                    placeholder="you@example.com"
+                    {...field}
+                    disabled={!isEditing}
+                  />
+                )}
+              />
             </div>
-          ) : (
-            <div className="space-y-4">
-              <div>
-                <strong>Email:</strong> {email}
-              </div>
-              <div>
-                <strong>Password:</strong> {password ? password : 'Não disponível'}
-              </div>
-              <Button onClick={() => setEditMode(true)} className="w-full">Edit</Button>
+            <div className="space-y-2">
+              <Label htmlFor="password">Senha</Label>
+              <Controller
+                name="password"
+                control={control}
+                render={({ field }) => (
+                  <Input
+                    id="password"
+                    type="password"
+                    placeholder="********"
+                    {...field}
+                    disabled={!isEditing}
+                  />
+                )}
+              />
             </div>
-          )}
-          <Button onClick={handleLogout} className="w-full bg-red-500 text-white">Logout</Button>
+            <Button
+              type="button"
+              onClick={handleEdit}
+              className="w-full"
+            >
+              {isEditing ? 'Salvar' : 'Editar'}
+            </Button>
+            <Button
+              type="button"
+              onClick={handleLogout}
+              className="w-full bg-red-500 mt-4"
+            >
+              Sair
+            </Button>
+          </form>
         </CardContent>
       </Card>
     </div>
   );
-};
+}
 
 export default ProfilePage;
