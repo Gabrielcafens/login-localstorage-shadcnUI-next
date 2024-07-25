@@ -13,7 +13,6 @@ type FormData = {
   password: string;
   token: string;
 };
-
 export function ProfilePage() {
   const { control, handleSubmit, reset } = useForm<FormData>();
   const [isEditing, setIsEditing] = useState(false);
@@ -34,18 +33,15 @@ export function ProfilePage() {
       reset(userData);
       setLoading(false);
     }
-  }, [router, reset]);
-
+  }, []);
   if (loading) {
     return <div>Loading...</div>;
   }
-
   const onSubmit = (data: FormData) => {
     localStorage.setItem('user', JSON.stringify(data));
     alert('Perfil atualizado com sucesso!');
     setIsEditing(false);
   };
-
   const handleEdit = () => {
     if (isEditing) {
       handleSubmit(onSubmit)();
@@ -58,7 +54,6 @@ export function ProfilePage() {
     localStorage.removeItem('user');
     router.push('/');
   };
-
   return (
     <div className="flex items-center justify-center min-h-screen">
       <Card className="w-full max-w-md p-8 space-y-8 rounded-lg shadow-lg">

@@ -18,13 +18,13 @@ const loginSchema = z.object({
   email: z.string().email('Endereço de email inválido.'),
   password: z.string().min(1, 'Senha é obrigatória.'),
 });
-
+type LoginFormValues = z.infer<typeof loginSchema>;
 export function LoginForm() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
+  const [email, setEmail] = useState<string>('');
+  const [password, setPassword] = useState<string>('');
+  const [error, setError] = useState<string>('');
   const router = useRouter();
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
     const storedUser = localStorage.getItem('user');
@@ -36,17 +36,17 @@ export function LoginForm() {
     }
   }, [router]);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     try {
-      const validatedData = loginSchema.parse({ email, password });
+      const validatedData: LoginFormValues = loginSchema.parse({ email, password });
       const storedUser = localStorage.getItem('user');
       const storedEmail = process.env.TEST_USER_EMAIL || '';
       const storedPassword = process.env.TEST_USER_PASSWORD || '';
 
       if (storedUser) {
-        const userData = JSON.parse(storedUser);
+        const userData = JSON.parse(storedUser) as LoginFormValues;
         if (email !== userData.email || password !== userData.password) {
           setError('Email ou senha inválidos.');
           return;
@@ -55,6 +55,7 @@ export function LoginForm() {
         setError('Email ou senha inválidos.');
         return;
       }
+
       const token = `token_${Math.random().toString(36).substr(2, 9)}`;
       const userData = { email: validatedData.email, password: validatedData.password, token };
       localStorage.setItem('user', JSON.stringify(userData));
@@ -72,7 +73,6 @@ export function LoginForm() {
   if (loading) {
     return <div>Loading...</div>;
   }
-
   return (
     <Card className="w-full max-w-md p-8 space-y-8 rounded-lg shadow-lg">
       <CardHeader>
