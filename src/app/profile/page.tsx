@@ -8,12 +8,14 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useRouter } from 'next/navigation';
 import { Spinner } from '@/components/ui/spinner';
+import { Toast, showToast } from '@/components/ui/toast';
 
 type FormData = {
   email: string;
   password: string;
   token: string;
 };
+
 export function ProfilePage() {
   const { control, handleSubmit, reset } = useForm<FormData>();
   const [isEditing, setIsEditing] = useState(false);
@@ -35,15 +37,17 @@ export function ProfilePage() {
       setLoading(false);
     }
   }, []);
+
   if (loading) {
     return <Spinner />;
   }
 
   const onSubmit = (data: FormData) => {
     localStorage.setItem('user', JSON.stringify(data));
-    alert('Perfil atualizado com sucesso!');
+    showToast('Perfil atualizado com sucesso!', 'success');
     setIsEditing(false);
   };
+
   const handleEdit = () => {
     if (isEditing) {
       handleSubmit(onSubmit)();
@@ -56,6 +60,7 @@ export function ProfilePage() {
     localStorage.removeItem('user');
     router.push('/');
   };
+
   return (
     <div className="flex items-center justify-center min-h-screen">
       <Card className="w-full max-w-md p-8 space-y-8 rounded-lg shadow-lg">
@@ -113,6 +118,7 @@ export function ProfilePage() {
           </form>
         </CardContent>
       </Card>
+      <Toast />
     </div>
   );
 }
