@@ -7,6 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useRouter } from 'next/navigation';
+import { Spinner } from '@/components/ui/spinner';
 
 type FormData = {
   email: string;
@@ -35,8 +36,9 @@ export function ProfilePage() {
     }
   }, []);
   if (loading) {
-    return <div>Loading...</div>;
+    return <Spinner />;
   }
+
   const onSubmit = (data: FormData) => {
     localStorage.setItem('user', JSON.stringify(data));
     alert('Perfil atualizado com sucesso!');

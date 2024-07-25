@@ -12,6 +12,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useRouter } from 'next/navigation';
 import { z } from 'zod';
+import { Spinner } from '@/components/ui/spinner';
 
 // Define o schema de validação com zod
 const loginSchema = z.object({
@@ -34,7 +35,7 @@ export function LoginForm() {
       localStorage.removeItem('user');
       setLoading(false);
     }
-  }, [router]);
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -71,7 +72,7 @@ export function LoginForm() {
   };
 
   if (loading) {
-    return <div>Loading...</div>;
+    return <Spinner />;
   }
   return (
     <Card className="w-full max-w-md p-8 space-y-8 rounded-lg shadow-lg">
