@@ -20,6 +20,7 @@ const loginSchema = z.object({
   password: z.string().min(1, 'Senha é obrigatória.'),
 });
 type LoginFormValues = z.infer<typeof loginSchema>;
+
 export function LoginForm() {
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
@@ -45,7 +46,6 @@ export function LoginForm() {
       const storedUser = localStorage.getItem('user');
       const storedEmail = process.env.TEST_USER_EMAIL || '';
       const storedPassword = process.env.TEST_USER_PASSWORD || '';
-
       if (storedUser) {
         const userData = JSON.parse(storedUser) as LoginFormValues;
         if (email !== userData.email || password !== userData.password) {
@@ -74,6 +74,7 @@ export function LoginForm() {
   if (loading) {
     return <Spinner />;
   }
+
   return (
     <Card className="w-full max-w-md p-8 space-y-8 rounded-lg shadow-lg">
       <CardHeader>
