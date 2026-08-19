@@ -44,8 +44,8 @@ export function LoginForm() {
     try {
       const validatedData: LoginFormValues = loginSchema.parse({ email, password });
       const storedUser = localStorage.getItem('user');
-      const storedEmail = process.env.TEST_USER_EMAIL || '';
-      const storedPassword = process.env.TEST_USER_PASSWORD || '';
+      const storedEmail = process.env.NEXT_PUBLIC_TEST_USER_EMAIL || '';
+      const storedPassword = process.env.NEXT_PUBLIC_TEST_USER_PASSWORD || '';
       if (storedUser) {
         const userData = JSON.parse(storedUser) as LoginFormValues;
         if (email !== userData.email || password !== userData.password) {
